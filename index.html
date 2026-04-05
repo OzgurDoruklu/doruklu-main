@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doruklu Bilişim & Ailesi</title>
+    <meta name="description" content="Doruklu ailesinin dijital merkez platformu.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #020617 0%, #1e1b4b 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #818cf8;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.5;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+
+        .blob-1 { top: -10%; left: 10%; width: 40vw; height: 40vw; background: #3730a3; border-radius: 50%; }
+        .blob-2 { bottom: -10%; right: 10%; width: 45vw; height: 45vw; background: #6b21a8; border-radius: 50%; animation-delay: -5s; }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 4rem 5rem;
+            text-align: center;
+            max-width: 650px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            animation: slideUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.4s ease;
+        }
+
+        .container:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 60px -10px rgba(0,0,0,0.6);
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin: 0 0 1rem 0;
+            font-weight: 700;
+            background: linear-gradient(to right, #c7d2fe, #e9d5ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin: 0 0 2rem 0;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .links-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #e2e8f0;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+        }
+
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(30px) scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="container">
+        <h1>doruklu.com</h1>
+        <p>Doruklu ailesinin dijital evine hoş geldiniz. Alt alan adlarımızı ziyaret edebilirsiniz.</p>
+        <div class="links-container">
+            <a href="https://toprak.doruklu.com" class="nav-link">Toprak</a>
+            <a href="https://ozgur.doruklu.com" class="nav-link">Özgür</a>
+            <a href="https://nurcan.doruklu.com" class="nav-link">Nurcan</a>
+        </div>
+    </div>
+</body>
+</html>
