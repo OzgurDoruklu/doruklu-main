@@ -10,11 +10,22 @@ export async function initAuth() {
     if (redirectTo) {
         localStorage.setItem('redirect_to', redirectTo);
     }
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+            await handleLoginSuccess(session.user, session);
+        }
+    });
+
+    const { data: { session } } = await supabase.auth.getSession();
     
     if (session) {
-        await handleLoginSuccess(session.user);
+        await handleLoginSuccess(session.user, session);
     } else {
-        ui.showScreen('auth-screen');
+        setTimeout(() => {
+            if (!AppState.user) {
+                ui.showScreen('auth-screen');
+            }
+        }, 500);
     }
 
     document.getElementById('google-btn').addEventListener('click', handleGoogleLogin);
@@ -31,11 +42,15 @@ async function handleGoogleLogin() {
     });
 }
 
-async function handleLoginSuccess(user) {
+async function handleLoginSuccess(user, session) {
     const storedRedirect = localStorage.getItem('redirect_to');
     if (storedRedirect) {
         localStorage.removeItem('redirect_to');
-        window.location.href = storedRedirect;
+        if (session && session.access_token) {
+            window.location.href = storedRedirect + '#access_token=' + session.access_token + '&refresh_token=' + session.refresh_token;
+        } else {
+            window.location.href = storedRedirect;
+        }
         return;
     }
 
