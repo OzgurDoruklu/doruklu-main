@@ -9,7 +9,7 @@ export async function initAuth() {
         localStorage.setItem('redirect_to', redirectTo);
     }
     supabase.auth.onAuthStateChange(async (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
             await handleLoginSuccess(session.user, session);
         }
     });
@@ -41,6 +41,8 @@ async function handleGoogleLogin() {
 }
 
 async function handleLoginSuccess(user, session) {
+    if (AppState.user) return; // Prevent double execution
+
     const storedRedirect = localStorage.getItem('redirect_to');
     if (storedRedirect) {
         localStorage.removeItem('redirect_to');
