@@ -3,130 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doruklu Bilişim & Ailesi</title>
-    <meta name="description" content="Doruklu ailesinin dijital merkez platformu.">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #020617 0%, #1e1b4b 100%);
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent: #818cf8;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .blob {
-            position: absolute;
-            filter: blur(100px);
-            z-index: 0;
-            opacity: 0.5;
-            animation: float 10s infinite ease-in-out alternate;
-        }
-
-        .blob-1 { top: -10%; left: 10%; width: 40vw; height: 40vw; background: #3730a3; border-radius: 50%; }
-        .blob-2 { bottom: -10%; right: 10%; width: 45vw; height: 45vw; background: #6b21a8; border-radius: 50%; animation-delay: -5s; }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 4rem 5rem;
-            text-align: center;
-            max-width: 650px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            animation: slideUp 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.4s ease;
-        }
-
-        .container:hover {
-            border-color: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 30px 60px -10px rgba(0,0,0,0.6);
-            transform: translateY(-5px);
-        }
-
-        h1 {
-            font-size: 4rem;
-            margin: 0 0 1rem 0;
-            font-weight: 700;
-            background: linear-gradient(to right, #c7d2fe, #e9d5ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
-        }
-
-        p {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            margin: 0 0 2rem 0;
-            line-height: 1.6;
-            font-weight: 300;
-        }
-
-        .links-container {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            padding: 0.75rem 1.5rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            color: #e2e8f0;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
-        }
-
-        @keyframes slideUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px) scale(1); }
-            100% { transform: translateY(30px) scale(1.05); }
-        }
-    </style>
+    <title>Doruklu Merkezi Yönetim (SSO Platform)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.doruklu.com/style.css">
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="container">
-        <h1>doruklu.com</h1>
-        <p>Doruklu ailesinin dijital evine hoş geldiniz. Alt alan adlarımızı ziyaret edebilirsiniz.</p>
-        <div class="links-container">
-            <a href="https://toprak.doruklu.com" class="nav-link">Toprak</a>
-            <a href="https://ozgur.doruklu.com" class="nav-link">Özgür</a>
-            <a href="https://nurcan.doruklu.com" class="nav-link">Nurcan</a>
+
+    <div id="alert-box" class="alert"></div>
+    <div id="loading-spinner" class="loading-overlay"><div class="spinner"></div></div>
+
+    <!-- 1. AUTH EKRANI -->
+    <div id="auth-screen" class="screen" style="display: flex;">
+        <div class="auth-container">
+            <h1 class="gradient-text">Doruklu Merkezi Portal</h1>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Ağ sistemine erişmek için lütfen Google ile kimliğinizi doğrulayın.</p>
+            
+            <button id="google-btn" class="primary-btn google-btn" style="padding: 1.2rem; font-size: 1.2rem; border-radius: 16px;">
+                <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Google ile Güvenli Giriş Yap
+            </button>
         </div>
     </div>
+
+    <!-- 2. DASHBOARD EKRANI -->
+    <div id="dashboard-screen" class="screen">
+        <header class="dashboard-header">
+            <h2 style="margin: 0;">Merkezi <span style="color: var(--primary)">Uygulamalar</span></h2>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <span>Bağlı Hesap: <span id="user-name" style="color: white; font-weight: 600;">--</span></span>
+                <button id="logout-btn" class="btn-danger" style="padding: 0.5rem 1rem;">Oturumu Kapat</button>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            
+            <h3 style="color: var(--text-secondary); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">Erişilebilir Alt Platformlar</h3>
+            <div class="apps-grid" id="apps-container">
+                <!-- JS'den Linkler Yüklenecek -->
+            </div>
+
+            <!-- ADMIN PANELS -->
+            <div id="admin-container" style="display: none; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 4rem; padding-top: 2rem;">
+                <h2 style="color: white; margin-bottom: 2rem;">Sistem Yönetimi (Yetkili Alan)</h2>
+
+                <div class="nav-tabs">
+                    <div class="nav-tab active" id="nav-users">RBAC Kullanıcı İzinleri</div>
+                    <div class="nav-tab" id="nav-cards">Oyun Yönetimi (Sorular)</div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="users-section" style="margin-top:2rem;">
+                    <h3 style="color: var(--text-secondary);">Kullanıcı Yetki Haritası</h3>
+                    <div class="table-container" style="margin-top: 1rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı / Rol</th>
+                                    <th>Toprak Oyunu</th>
+                                    <th>Özgür Paneli</th>
+                                    <th>Nurcan App</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <!-- JS ile Doldurulacak -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cards Tab -->
+                <div id="cards-section" style="display: none; margin-top:2rem;">
+                    <div style="display: flex; gap: 2rem; align-items: flex-start;">
+                        
+                        <!-- Yeni Soru Ekle -->
+                        <div class="table-container" style="flex: 1; padding: 2rem; margin-top: 0;">
+                            <h3 style="margin-top:0;">Yeni Bilgi Kartı (Soru) Ekle</h3>
+                            <form id="add-card-form">
+                                <div class="input-group">
+                                    <label style="display:block; margin-bottom:0.5rem; text-align:left;">Soru Tipi</label>
+                                    <select id="q-type" required>
+                                        <option value="single_choice">Çoktan Seçmeli (Tek Doğru)</option>
+                                        <option value="multi_choice">Çoklu Seçim (Birden fazla Doğru)</option>
+                                        <option value="free_text">Serbest Metin (Yazı)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label style="display:block; margin-bottom:0.5rem; text-align:left;">Soru Metni</label>
+                                    <textarea id="q-content" rows="3" required placeholder="Soruyu yazın..."></textarea>
+                                </div>
+                                <div class="input-group" id="options-group">
+                                    <label style="display:block; margin-bottom:0.5rem; text-align:left;">Seçenekler (Virgülle ayırın)</label>
+                                    <input type="text" id="q-options" placeholder="Örn: A, B, C, D">
+                                </div>
+                                <div class="input-group">
+                                    <label style="display:block; margin-bottom:0.5rem; text-align:left;">Doğru Cevap(lar)</label>
+                                    <input type="text" id="q-answer" required placeholder="Doğru cevaplar (Çoklu ise virgülle ayırın)">
+                                </div>
+                                <button type="submit" class="primary-btn">Soruyu Sisteme Ekle</button>
+                            </form>
+                        </div>
+
+                        <!-- Liste -->
+                        <div class="table-container" style="flex: 2; margin-top: 0;">
+                            <h3 style="padding: 1rem 1.5rem; margin:0; border-bottom: 1px solid rgba(255,255,255,0.1);">Soru Havuzu</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tip</th>
+                                        <th>Soru</th>
+                                        <th>Doğru Cevap</th>
+                                        <th>İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cards-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>
