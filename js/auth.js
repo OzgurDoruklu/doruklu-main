@@ -51,6 +51,11 @@ async function handleLoginSuccess(user) {
     
     document.getElementById('user-name').textContent = AppState.profile.display_name || user.email;
     
+    ui.renderUserBadge(user, AppState.profile, async () => {
+        await supabase.auth.signOut();
+        window.location.href = 'https://doruklu.com';
+    });
+    
     ui.showScreen('dashboard-screen');
     
     if (AppState.profile.role === 'super_admin' || AppState.profile.role === 'admin') {
