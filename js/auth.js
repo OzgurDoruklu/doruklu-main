@@ -2,9 +2,7 @@ import { supabase, AppState } from 'https://cdn.doruklu.com/supabase-config.js';
 import { ui } from 'https://cdn.doruklu.com/ui.js';
 import { initAdminPanel, loadUserLinks, initCardManager } from './app.js';
 
-export async function initAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
-    
+export async function initAuth() {    
     const urlParams = new URLSearchParams(window.location.search);
     const redirectTo = urlParams.get('redirect_to');
     if (redirectTo) {
