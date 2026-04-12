@@ -13,17 +13,22 @@ export async function initAuth() {
     // Giriş butonlarını her ihtimale karşı EN BAŞTA aktif et (Donmayı önlemek için)
     const googleBtn = document.getElementById('google-btn');
     if (googleBtn) googleBtn.onclick = handleGoogleLogin;
-    
-    document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
 
-    let _loginHandled = false;
-
-    // Auth state listener
-    supabase.auth.onAuthStateChange(async (event, session) => {
-        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
-            await handleLoginSuccess(session.user, session);
+    // SSO TOKEN RELAY HANDLER (Hub'a dönerken oturumun düşmesini engeller)
+    const ssoToken = urlParams.get('sso_token');
+    const ssoRefresh = urlParams.get('sso_refresh');
+    if (ssoToken && ssoRefresh) {
+        ui.setLoading(true);
+        const { error } = await supabase.auth.setSession({
+            access_token: ssoToken,
+            refresh_token: ssoRefresh
+        });
+        ui.setLoading(false);
+        if (!error) {
+            // URL'yi temizle (estetik için)
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
-    });
+    }
 
     const { data: { session } } = await supabase.auth.getSession();
     
@@ -57,7 +62,8 @@ export async function initAuth() {
 
             AppState.user = user;
             
-            const { data: profile, error } = await supabase
+            // Profil çek/oluştur CDN auth.js'e devredildi ancak burada manuel çekiyoruz (main hub özel durumu)
+            let { data: profile, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', user.id)
@@ -65,29 +71,34 @@ export async function initAuth() {
             
             if (error && error.code !== 'PGRST116') throw error;
 
+            if (!profile) {
+                // Manuel Fallback (CDN auth.js hallediyor ama burada da emniyet için kalsın)
+                const { data: newP } = await supabase.from('profiles').insert({ id: user.id, role: 'player', display_name: user.email.split('@')[0] }).select().single();
+                profile = newP;
+            }
+
             AppState.profile = profile || { role: 'player', permissions: {} };
             
+            // Global Header & Badge (manageCallback KALDIRILDI - Dashboard tetiği var)
+            ui.renderGlobalHeader("Portalı");
             ui.renderUserBadge(user, AppState.profile, async () => {
                 const { clearAllCaches } = await import('https://cdn.doruklu.com/auth.js');
                 await clearAllCaches();
                 await supabase.auth.signOut();
                 window.location.href = 'https://doruklu.com/?logout=true';
-            }, () => {
-                // Management Callback
-                if (AppState.profile.role === 'super_admin' || AppState.profile.role === 'admin') {
-                    document.getElementById('dashboard-screen').style.display = 'none';
-                    document.getElementById('management-screen').style.display = 'flex';
-                }
             });
             
             ui.showScreen('dashboard-screen');
             
             if (AppState.profile.role === 'super_admin' || AppState.profile.role === 'admin') {
-                document.getElementById('admin-container').style.display = 'block';
-                initAdminPanel();
-                initCardManager();
+                document.getElementById('admin-quick-access').style.display = 'block';
+                document.getElementById('go-to-mgmt-btn').onclick = () => {
+                    ui.showScreen('management-screen');
+                    initAdminPanel();
+                    initCardManager();
+                };
             } else {
-                document.getElementById('admin-container').style.display = 'none';
+                document.getElementById('admin-quick-access').style.display = 'none';
             }
             
             loadUserLinks();

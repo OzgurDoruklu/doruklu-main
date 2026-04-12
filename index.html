@@ -4,8 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doruklu Merkezi Yönetim (SSO Platform)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.doruklu.com/style.css">
+    <style>
+        /* Hub Specific Styles */
+        :root {
+            --card-code-bg: rgba(30, 41, 59, 0.7);
+        }
+
+        body {
+            padding-top: 80px; /* Global header gap */
+        }
+
+        .portal-section-title {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .portal-section-title::after {
+            content: ""; flex: 1; height: 1px; background: linear-gradient(to right, rgba(255,255,255,0.1), transparent);
+        }
+
+        /* Nav Tabs Modern */
+        .nav-tabs {
+            display: flex; gap: 8px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 12px; border: 1px solid var(--glass-border); margin-bottom: 2.5rem;
+        }
+        .nav-tab {
+            padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: all 0.3s; color: var(--text-secondary); font-weight: 500; font-size: 0.95rem;
+        }
+        .nav-tab:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-tab.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+
+        /* Code Manager Question Card */
+        .question-card-code {
+            background: var(--card-code-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .question-card-code:hover {
+            transform: translateY(-3px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .q-header {
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .q-body { padding: 15px; font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; }
+        .q-footer {
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.15);
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .q-type-badge { font-size: 0.7rem; background: rgba(99, 102, 241, 0.15); color: #818cf8; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .q-actions { display: flex; gap: 8px; }
+        .q-btn { background: none; border: none; cursor: pointer; color: #64748b; padding: 4px; border-radius: 4px; transition: 0.2s; }
+        .q-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+        .q-btn.delete:hover { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+
+        #cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .management-actions {
+            display: flex; justify-content: flex-end; margin-bottom: 1.5rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -32,102 +115,110 @@
 
     <!-- 2. DASHBOARD EKRANI -->
     <div id="dashboard-screen" class="screen">
-        <header class="dashboard-header">
-            <h2 style="margin: 0; font-weight: 700; letter-spacing: -0.5px;">Merkezi <span style="color: var(--primary)">Portal</span></h2>
-        </header>
-
-        <div id="main-dashboard-content" class="dashboard-content">
-            <h3 style="color: var(--text-secondary); border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 0.8rem; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">Erişilebilir Alt Platformlar</h3>
+        <div class="dashboard-content" style="padding-top: 2rem;">
+            <div class="portal-section-title">Erişilebilir Uygulamalar</div>
             <div class="apps-grid" id="apps-container">
-                <!-- JS'den Linkler Yüklenecek -->
+                <!-- JS'den Yüklenecek -->
+            </div>
+
+            <!-- Management trigger for admins only (JS will show/hide) -->
+            <div id="admin-quick-access" style="display:none; margin-top: 4rem;">
+                <div class="portal-section-title">Admin Hızlı Erişim</div>
+                <button id="go-to-mgmt-btn" class="app-card" style="width:100%; text-align:left; cursor:pointer;">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div style="background:rgba(99, 102, 241, 0.2); padding:15px; border-radius:12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-weight:700; font-size:1.1rem;">Sistem Yönetimi</div>
+                            <div style="color:var(--text-secondary); font-size:0.9rem;">Yetkileri düzenleyin, soru havuzunu yönetin.</div>
+                        </div>
+                    </div>
+                </button>
             </div>
         </div>
     </div>
 
     <!-- 3. MANAGEMENT EKRANI -->
     <div id="management-screen" class="screen">
-        <header class="dashboard-header">
-            <h2 style="margin: 0; font-weight: 700; letter-spacing: -0.5px;">Sistem <span style="color: var(--primary)">Yönetimi</span></h2>
-            <div id="header-actions">
-                <button id="back-to-dash-btn" class="glass-btn">← Portala Dön</button>
+        <div class="dashboard-content" style="padding-top: 1rem;">
+            <div class="management-actions">
+                <button id="back-to-dash-btn" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Portala Geri Dön
+                </button>
             </div>
-        </header>
 
-        <div class="dashboard-content">
-            <div id="admin-container" style="padding-top: 0;">
-                <div class="nav-tabs">
-                    <div class="nav-tab active" id="nav-users">RBAC Kullanıcı İzinleri</div>
-                    <div class="nav-tab" id="nav-cards">Oyun Yönetimi (Sorular)</div>
+            <div class="nav-tabs">
+                <div class="nav-tab active" id="nav-users">Kullanıcı İzinleri</div>
+                <div class="nav-tab" id="nav-cards">Soru Yönetimi</div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users-section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı / Rol</th>
+                                <th>Toprak</th>
+                                <th>Özgür</th>
+                                <th>Nurcan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Cards Tab -->
+            <div id="cards-section" style="display: none;">
+                <div class="management-actions" style="margin-bottom: 2rem;">
+                    <button id="open-add-card-btn" class="primary-btn" style="width:auto; padding: 10px 25px;">+ Yeni Soru Ekle</button>
                 </div>
 
-                <!-- Users Tab -->
-                <div id="users-section" style="margin-top:2rem;">
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Kullanıcı / Rol</th>
-                                    <th>Toprak Oyunu</th>
-                                    <th>Özgür Paneli</th>
-                                    <th>Nurcan App</th>
-                                </tr>
-                            </thead>
-                            <tbody id="users-table-body">
-                            </tbody>
-                        </table>
-                    </div>
+                <!-- Add Card Form (Modal-like or Inline) -->
+                <div id="add-card-container" style="display:none; margin-bottom: 3rem;" class="auth-container">
+                    <h3 style="margin-top:0; color:white;">Soru Tanımla</h3>
+                    <form id="add-card-form" style="text-align:left;">
+                        <input type="hidden" id="edit-id">
+                        <div class="input-group">
+                            <label style="display:block; margin-bottom: 8px; font-size:0.9rem; color:var(--text-secondary);">Soru Tipi</label>
+                            <select id="q-type" style="width:100%; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:white;">
+                                <option value="single_choice">Çoktan Seçmeli (Tek)</option>
+                                <option value="multi_choice">Çoktan Seçmeli (Çoklu)</option>
+                                <option value="free_text">Metin Aramalı</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label style="display:block; margin-bottom: 8px; font-size:0.9rem; color:var(--text-secondary);">Soru İçeriği</label>
+                            <textarea id="q-content" rows="3" required style="width:100%; padding:12px; border-radius:10px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:white; font-family:inherit;"></textarea>
+                        </div>
+                        <div class="input-group" id="options-group">
+                            <label style="display:block; margin-bottom: 8px; font-size:0.9rem; color:var(--text-secondary);">Seçenekler (Virgülle ayırın)</label>
+                            <input type="text" id="q-options" placeholder="A, B, C, D">
+                        </div>
+                        <div class="input-group">
+                            <label style="display:block; margin-bottom: 8px; font-size:0.9rem; color:var(--text-secondary);">Doğru Cevap</label>
+                            <input type="text" id="q-answer" required placeholder="Cevabı yazın">
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" class="primary-btn" id="save-card-btn">Soruyu Kaydet</button>
+                            <button type="button" id="cancel-add-btn" class="glass-btn" style="width:auto; margin-top:0.5rem; padding:0 20px;">İptal</button>
+                        </div>
+                    </form>
                 </div>
 
-                <!-- Cards Tab -->
-                <div id="cards-section" style="display: none; margin-top:2rem;">
-                    <div class="cards-management-grid">
-                        <div class="table-container auth-container" style="padding: 2rem; margin-top: 0; max-width: none; text-align: left;">
-                            <h3 style="margin-top:0;">Yeni Bilgi Kartı Ekle</h3>
-                            <form id="add-card-form">
-                                <div class="input-group">
-                                    <label>Soru Tipi</label>
-                                    <select id="q-type" required>
-                                        <option value="single_choice">Çoktan Seçmeli (Tek Doğru)</option>
-                                        <option value="multi_choice">Çoklu Seçim (Birden fazla Doğru)</option>
-                                        <option value="free_text">Serbest Metin (Yazı)</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label>Soru Metni</label>
-                                    <textarea id="q-content" rows="3" required placeholder="Soruyu yazın..."></textarea>
-                                </div>
-                                <div id="options-group" class="input-group">
-                                    <label>Seçenekler (Virgülle ayırın)</label>
-                                    <input type="text" id="q-options" placeholder="Örn: A, B, C, D">
-                                </div>
-                                <div class="input-group">
-                                    <label>Doğru Cevap(lar)</label>
-                                    <input type="text" id="q-answer" required placeholder="Doğru cevaplar">
-                                </div>
-                                <button type="submit" class="primary-btn">Soruyu Sisteme Ekle</button>
-                            </form>
-                        </div>
-
-                        <div class="table-container" style="margin-top: 0;">
-                            <h3 style="padding: 1.5rem; margin:0; border-bottom: 1px solid rgba(255,255,255,0.1);">Soru Havuzu</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Tip</th>
-                                        <th>Soru</th>
-                                        <th>Doğru Cevap</th>
-                                        <th>İşlem</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="cards-table-body">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div id="cards-grid">
+                    <!-- Soru kartları buraya gelecek (Code Manager Style) -->
                 </div>
             </div>
         </div>
     </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
     </div>
 
     <script type="module" src="js/app.js"></script>
