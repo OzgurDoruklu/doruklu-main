@@ -62,7 +62,6 @@ export async function initAuth() {
             
         AppState.profile = profile || { role: 'player', permissions: {} };
         
-        document.getElementById('user-name').textContent = AppState.profile.display_name || user.email;
         
         ui.renderUserBadge(user, AppState.profile, async () => {
             await supabase.auth.signOut();

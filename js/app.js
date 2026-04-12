@@ -4,34 +4,88 @@ import { ui } from 'https://cdn.doruklu.com/ui.js';
 export function loadUserLinks() {
     const appsContainer = document.getElementById('apps-container');
     const perms = AppState.profile.permissions || {};
+    const isSuper = AppState.profile.role === 'super_admin';
     
     appsContainer.innerHTML = '';
     
-    const apps = [
-        { key: 'toprak_game', name: 'Toprak Bilgi Kartı Oyunu', url: 'https://toprak.doruklu.com' },
-        { key: 'ozgur_dashboard', name: 'Özgür\'ün Alanı', url: 'https://ozgur.doruklu.com' },
-        { key: 'nurcan_app', name: 'Nurcan Uygulaması', url: 'https://nurcan.doruklu.com' }
+    const appGroups = [
+        { 
+            name: 'Toprak Platformu', 
+            url: 'https://toprak.doruklu.com',
+            key: 'toprak_game',
+            pages: [
+                { name: 'Bilgi Kartı Oyunu', url: 'https://toprak.doruklu.com' },
+                { name: 'Skor Tablosu', url: 'https://toprak.doruklu.com/#leaderboard' }
+            ]
+        },
+        { 
+            name: 'Özgür Platformu', 
+            url: 'https://ozgur.doruklu.com',
+            key: 'ozgur_dashboard',
+            pages: [
+                { name: 'Admin Kontrol Paneli', url: 'https://ozgur.doruklu.com' }
+            ]
+        },
+        { 
+            name: 'Nurcan Platformu', 
+            url: 'https://nurcan.doruklu.com',
+            key: 'nurcan_app',
+            pages: [
+                { name: 'Ana Uygulama', url: 'https://nurcan.doruklu.com' }
+            ]
+        }
     ];
     
-    apps.forEach(app => {
-        const hasAccess = AppState.profile.role === 'super_admin' || perms[app.key] === true;
-        let cardUrl = hasAccess ? app.url : '#';
-        let opacity = hasAccess ? '1' : '0.5';
-        let badge = hasAccess ? '<span class="badge success">Erişim Açık</span>' : '<span class="badge danger">Yetki Yok</span>';
+    appGroups.forEach(group => {
+        const hasAccess = isSuper || perms[group.key] === true;
+        const opacity = hasAccess ? '1' : '0.5';
+        const badge = hasAccess ? '<span class="badge success">Erişim Açık</span>' : '<span class="badge danger">Yetki Yok</span>';
         
+        let pagesHTML = '';
+        if (hasAccess) {
+            pagesHTML = group.pages.map(page => `
+                <a href="${page.url}" class="sub-page-link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    ${page.name}
+                </a>
+            `).join('');
+        }
+
         appsContainer.innerHTML += `
-            <a href="${cardUrl}" class="app-card" style="opacity: ${opacity}">
-                <h3>${app.name}</h3>
-                ${badge}
-                ${!hasAccess ? '<p style="font-size:0.8rem; margin-top:10px;">Erişmek için yöneticiden yetki almalısınız.</p>' : ''}
-            </a>
+            <div class="app-group-card" style="opacity: ${opacity}">
+                <div class="app-group-header">
+                    <a href="${hasAccess ? group.url : '#'}" style="text-decoration:none; color:inherit; flex:1;">
+                        <h3 style="margin:0;">${group.name}</h3>
+                    </a>
+                    ${badge}
+                </div>
+                <div class="app-pages-list">
+                    ${hasAccess ? pagesHTML : '<p style="font-size:0.85rem; color:rgba(255,255,255,0.4); margin: 0 0.5rem;">Erişmek için yöneticiden yetki almalısınız.</p>'}
+                </div>
+            </div>
         `;
     });
 }
 
 // ==== USERS TAB ====
 export async function initAdminPanel() {
-    // Only super_admin can see this
+    // Nav Toggle
+    document.getElementById('nav-management-btn').addEventListener('click', () => {
+        document.getElementById('dashboard-screen').style.display = 'none';
+        document.getElementById('management-screen').style.display = 'flex';
+    });
+    document.getElementById('back-to-dash-btn').addEventListener('click', () => {
+        document.getElementById('management-screen').style.display = 'none';
+        document.getElementById('dashboard-screen').style.display = 'flex';
+    });
+
+    // Only super_admin or admin can see the button
+    const isUIAdmin = AppState.profile.role === 'super_admin' || AppState.profile.role === 'admin';
+    if (isUIAdmin) {
+        document.getElementById('nav-management-btn').style.display = 'flex';
+    }
+
+    // Only super_admin can see the user management tab
     if (AppState.profile.role !== 'super_admin') {
         document.getElementById('nav-users').style.display = 'none';
         document.getElementById('users-section').style.display = 'none';

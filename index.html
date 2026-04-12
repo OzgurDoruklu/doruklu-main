@@ -33,24 +33,31 @@
     <!-- 2. DASHBOARD EKRANI -->
     <div id="dashboard-screen" class="screen">
         <header class="dashboard-header">
-            <h2 style="margin: 0;">Merkezi <span style="color: var(--primary)">Uygulamalar</span></h2>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <span>Bağlı Hesap: <span id="user-name" style="color: white; font-weight: 600;">--</span></span>
-                <button id="logout-btn" class="btn-danger" style="padding: 0.5rem 1rem;">Oturumu Kapat</button>
+            <h2 style="margin: 0; font-weight: 700; letter-spacing: -0.5px;">Merkezi <span style="color: var(--primary)">Portal</span></h2>
+            <div id="header-actions">
+                <button id="nav-management-btn" class="glass-btn admin-only" style="display:none;">Sistem Yönetimi</button>
+            </div>
+        </header>
+
+        <div id="main-dashboard-content" class="dashboard-content">
+            <h3 style="color: var(--text-secondary); border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 0.8rem; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">Erişilebilir Alt Platformlar</h3>
+            <div class="apps-grid" id="apps-container">
+                <!-- JS'den Linkler Yüklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. MANAGEMENT EKRANI -->
+    <div id="management-screen" class="screen">
+        <header class="dashboard-header">
+            <h2 style="margin: 0; font-weight: 700; letter-spacing: -0.5px;">Sistem <span style="color: var(--primary)">Yönetimi</span></h2>
+            <div id="header-actions">
+                <button id="back-to-dash-btn" class="glass-btn">← Portala Dön</button>
             </div>
         </header>
 
         <div class="dashboard-content">
-            
-            <h3 style="color: var(--text-secondary); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">Erişilebilir Alt Platformlar</h3>
-            <div class="apps-grid" id="apps-container">
-                <!-- JS'den Linkler Yüklenecek -->
-            </div>
-
-            <!-- ADMIN PANELS -->
-            <div id="admin-container" style="display: none; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 4rem; padding-top: 2rem;">
-                <h2 style="color: white; margin-bottom: 2rem;">Sistem Yönetimi (Yetkili Alan)</h2>
-
+            <div id="admin-container" style="padding-top: 0;">
                 <div class="nav-tabs">
                     <div class="nav-tab active" id="nav-users">RBAC Kullanıcı İzinleri</div>
                     <div class="nav-tab" id="nav-cards">Oyun Yönetimi (Sorular)</div>
@@ -58,8 +65,7 @@
 
                 <!-- Users Tab -->
                 <div id="users-section" style="margin-top:2rem;">
-                    <h3 style="color: var(--text-secondary);">Kullanıcı Yetki Haritası</h3>
-                    <div class="table-container" style="margin-top: 1rem;">
+                    <div class="table-container">
                         <table>
                             <thead>
                                 <tr>
@@ -70,7 +76,6 @@
                                 </tr>
                             </thead>
                             <tbody id="users-table-body">
-                                <!-- JS ile Doldurulacak -->
                             </tbody>
                         </table>
                     </div>
@@ -78,14 +83,12 @@
 
                 <!-- Cards Tab -->
                 <div id="cards-section" style="display: none; margin-top:2rem;">
-                    <div style="display: flex; gap: 2rem; align-items: flex-start;">
-                        
-                        <!-- Yeni Soru Ekle -->
-                        <div class="table-container" style="flex: 1; padding: 2rem; margin-top: 0;">
-                            <h3 style="margin-top:0;">Yeni Bilgi Kartı (Soru) Ekle</h3>
+                    <div class="cards-management-grid">
+                        <div class="table-container auth-container" style="padding: 2rem; margin-top: 0; max-width: none; text-align: left;">
+                            <h3 style="margin-top:0;">Yeni Bilgi Kartı Ekle</h3>
                             <form id="add-card-form">
                                 <div class="input-group">
-                                    <label style="display:block; margin-bottom:0.5rem; text-align:left;">Soru Tipi</label>
+                                    <label>Soru Tipi</label>
                                     <select id="q-type" required>
                                         <option value="single_choice">Çoktan Seçmeli (Tek Doğru)</option>
                                         <option value="multi_choice">Çoklu Seçim (Birden fazla Doğru)</option>
@@ -93,24 +96,23 @@
                                     </select>
                                 </div>
                                 <div class="input-group">
-                                    <label style="display:block; margin-bottom:0.5rem; text-align:left;">Soru Metni</label>
+                                    <label>Soru Metni</label>
                                     <textarea id="q-content" rows="3" required placeholder="Soruyu yazın..."></textarea>
                                 </div>
-                                <div class="input-group" id="options-group">
-                                    <label style="display:block; margin-bottom:0.5rem; text-align:left;">Seçenekler (Virgülle ayırın)</label>
+                                <div id="options-group" class="input-group">
+                                    <label>Seçenekler (Virgülle ayırın)</label>
                                     <input type="text" id="q-options" placeholder="Örn: A, B, C, D">
                                 </div>
                                 <div class="input-group">
-                                    <label style="display:block; margin-bottom:0.5rem; text-align:left;">Doğru Cevap(lar)</label>
-                                    <input type="text" id="q-answer" required placeholder="Doğru cevaplar (Çoklu ise virgülle ayırın)">
+                                    <label>Doğru Cevap(lar)</label>
+                                    <input type="text" id="q-answer" required placeholder="Doğru cevaplar">
                                 </div>
                                 <button type="submit" class="primary-btn">Soruyu Sisteme Ekle</button>
                             </form>
                         </div>
 
-                        <!-- Liste -->
-                        <div class="table-container" style="flex: 2; margin-top: 0;">
-                            <h3 style="padding: 1rem 1.5rem; margin:0; border-bottom: 1px solid rgba(255,255,255,0.1);">Soru Havuzu</h3>
+                        <div class="table-container" style="margin-top: 0;">
+                            <h3 style="padding: 1.5rem; margin:0; border-bottom: 1px solid rgba(255,255,255,0.1);">Soru Havuzu</h3>
                             <table>
                                 <thead>
                                     <tr>
@@ -126,10 +128,9 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
+    </div>
     </div>
 
     <script type="module" src="js/app.js"></script>
