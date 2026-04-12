@@ -72,6 +72,12 @@ export async function initAuth() {
                 await clearAllCaches();
                 await supabase.auth.signOut();
                 window.location.href = 'https://doruklu.com/?logout=true';
+            }, () => {
+                // Management Callback
+                if (AppState.profile.role === 'super_admin' || AppState.profile.role === 'admin') {
+                    document.getElementById('dashboard-screen').style.display = 'none';
+                    document.getElementById('management-screen').style.display = 'flex';
+                }
             });
             
             ui.showScreen('dashboard-screen');

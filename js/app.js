@@ -69,21 +69,12 @@ export function loadUserLinks() {
 
 // ==== USERS TAB ====
 export async function initAdminPanel() {
-    // Nav Toggle
-    document.getElementById('nav-management-btn').addEventListener('click', () => {
-        document.getElementById('dashboard-screen').style.display = 'none';
-        document.getElementById('management-screen').style.display = 'flex';
-    });
+    // Only super_admin or admin can see the management screen
+    // Note: Triggered via the global profile badge dropdown
     document.getElementById('back-to-dash-btn').addEventListener('click', () => {
         document.getElementById('management-screen').style.display = 'none';
         document.getElementById('dashboard-screen').style.display = 'flex';
     });
-
-    // Only super_admin or admin can see the button
-    const isUIAdmin = AppState.profile.role === 'super_admin' || AppState.profile.role === 'admin';
-    if (isUIAdmin) {
-        document.getElementById('nav-management-btn').style.display = 'flex';
-    }
 
     // Only super_admin can see the user management tab
     if (AppState.profile.role !== 'super_admin') {
