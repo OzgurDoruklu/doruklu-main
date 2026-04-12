@@ -8,6 +8,9 @@ export async function initAuth() {
     if (redirectTo) {
         localStorage.setItem('redirect_to', redirectTo);
     }
+
+    let _handled = false;
+
     supabase.auth.onAuthStateChange(async (event, session) => {
         if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
             await handleLoginSuccess(session.user, session);
@@ -28,6 +31,48 @@ export async function initAuth() {
 
     document.getElementById('google-btn').addEventListener('click', handleGoogleLogin);
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
+
+    async function handleLoginSuccess(user, session) {
+        if (AppState.user) return;
+
+        // Redirect bekleyen subdomain varsa yönlendir
+        const storedRedirect = localStorage.getItem('redirect_to');
+        if (storedRedirect) {
+            localStorage.removeItem('redirect_to');
+            // Session zaten cookie'de paylaşıldığı için token eklemeye gerek yok
+            window.location.href = storedRedirect;
+            return;
+        }
+
+        AppState.user = user;
+        
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+            
+        AppState.profile = profile || { role: 'player', permissions: {} };
+        
+        document.getElementById('user-name').textContent = AppState.profile.display_name || user.email;
+        
+        ui.renderUserBadge(user, AppState.profile, async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'https://doruklu.com';
+        });
+        
+        ui.showScreen('dashboard-screen');
+        
+        if (AppState.profile.role === 'super_admin' || AppState.profile.role === 'admin') {
+            document.getElementById('admin-container').style.display = 'block';
+            initAdminPanel();
+            initCardManager();
+        } else {
+            document.getElementById('admin-container').style.display = 'none';
+        }
+        
+        loadUserLinks();
+    }
 }
 
 async function handleGoogleLogin() {
@@ -38,50 +83,6 @@ async function handleGoogleLogin() {
             redirectTo: redirectTo
         }
     });
-}
-
-async function handleLoginSuccess(user, session) {
-    if (AppState.user) return; // Prevent double execution
-
-    const storedRedirect = localStorage.getItem('redirect_to');
-    if (storedRedirect) {
-        localStorage.removeItem('redirect_to');
-        if (session && session.access_token) {
-            window.location.href = storedRedirect + '#access_token=' + session.access_token + '&refresh_token=' + session.refresh_token;
-        } else {
-            window.location.href = storedRedirect;
-        }
-        return;
-    }
-
-    AppState.user = user;
-    
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-        
-    AppState.profile = profile || { role: 'player', permissions: {} };
-    
-    document.getElementById('user-name').textContent = AppState.profile.display_name || user.email;
-    
-    ui.renderUserBadge(user, AppState.profile, async () => {
-        await supabase.auth.signOut();
-        window.location.href = 'https://doruklu.com';
-    });
-    
-    ui.showScreen('dashboard-screen');
-    
-    if (AppState.profile.role === 'super_admin' || AppState.profile.role === 'admin') {
-        document.getElementById('admin-container').style.display = 'block';
-        initAdminPanel();
-        initCardManager();
-    } else {
-        document.getElementById('admin-container').style.display = 'none';
-    }
-    
-    loadUserLinks();
 }
 
 async function handleLogout() {
