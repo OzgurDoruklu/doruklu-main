@@ -1,4 +1,5 @@
-import { supabase, AppState } from 'https://cdn.doruklu.com/supabase-config.js';
+import { supabase, AppState, PLATFORM_VERSION } from 'https://cdn.doruklu.com/supabase-config.js';
+
 import { ui } from 'https://cdn.doruklu.com/ui.js';
 import { initAdminPanel, loadUserLinks, initCardManager } from './app.js';
 
@@ -7,7 +8,18 @@ let _loginHandled = false;
 console.log("Doruklu Auth Loaded - v1.1.2_FIXED");
 
 export async function initAuth() {    
-    // ...
+    // 0. Otomatik Versiyon Kontrolü (Cache Busting)
+    const storedVersion = localStorage.getItem('DORUKLU_PLATFORM_VERSION');
+    if (storedVersion !== PLATFORM_VERSION) {
+        console.log(`[Platform Hub] Yeni versiyon tespit edildi. Önbellek temizleniyor...`);
+        localStorage.clear();
+        sessionStorage.clear();
+        localStorage.setItem('DORUKLU_PLATFORM_VERSION', PLATFORM_VERSION);
+        window.location.reload(true);
+        return;
+    }
+
+    // Redirect parametresini kaydet
     const urlParams = new URLSearchParams(window.location.search);
     const redirectTo = urlParams.get('redirect_to');
     if (redirectTo) {
