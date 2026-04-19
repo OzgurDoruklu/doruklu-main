@@ -4,38 +4,47 @@ import { initAdminPanel, loadUserLinks, initCardManager } from './app.js';
 
 let _loginHandled = false;
 
+console.log("Doruklu Auth Loaded - v1.1.2_FIXED");
 
 export async function initAuth() {    
-    // Redirect parametresini kaydet
+    // ...
     const urlParams = new URLSearchParams(window.location.search);
     const redirectTo = urlParams.get('redirect_to');
     if (redirectTo) {
         localStorage.setItem('redirect_to', redirectTo);
     }
 
-    // Giriş butonlarını her ihtimale karşı EN BAŞTA aktif et (Donmayı önlemek için)
+    // Giriş butonlarını her ihtimale karşı EN BAŞTA aktif et
     const googleBtn = document.getElementById('google-btn');
     if (googleBtn) googleBtn.onclick = handleGoogleLogin;
 
-    // SSO TOKEN RELAY HANDLER (Hub'a dönerken oturumun düşmesini engeller)
     const ssoToken = urlParams.get('sso_token');
     const ssoRefresh = urlParams.get('sso_refresh');
     if (ssoToken && ssoRefresh) {
         ui.setLoading(true);
-        const { error } = await supabase.auth.setSession({
-            access_token: ssoToken,
-            refresh_token: ssoRefresh
-        });
-        ui.setLoading(false);
-        if (!error) {
-            // URL'yi temizle (estetik için)
-            window.history.replaceState({}, document.title, window.location.pathname);
+        try {
+            const { error } = await supabase.auth.setSession({
+                access_token: ssoToken,
+                refresh_token: ssoRefresh
+            });
+            if (error) console.error("SSO Token Relay Error:", error);
+            ui.setLoading(false);
+            if (!error) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        } catch (e) {
+            console.error("SSO Fatal Error:", e);
+            ui.setLoading(false);
         }
     }
 
     try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
+        if (sessionError) {
+            console.error("Session fetch error (check clock skew):", sessionError);
+        }
+
         if (session) {
             await handleLoginSuccess(session.user, session);
         } else {
@@ -48,13 +57,12 @@ export async function initAuth() {
     } catch (err) {
         console.error("Auth initialization failed:", err);
         ui.showScreen('auth-screen');
-        ui.showError("Sistem başlatılamadı. Lütfen sayfayı yenileyin.");
     }
-
 
     async function handleLoginSuccess(user, session) {
         if (_loginHandled) return;
         _loginHandled = true;
+        console.log("Login success for:", user.email);
 
         try {
             // Bekleyen subdomain redirect'i varsa token relay yap
