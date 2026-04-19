@@ -130,11 +130,17 @@ export async function initAuth() {
             
             loadUserLinks();
         } catch (err) {
-            console.error("Login handling failed:", err);
-            _loginHandled = false; // Kullanıcı tekrar deneyebilsin
+            console.error("Login handling failed (Recovery Triggered):", err);
+            
+            // "Ghost Session" veya silinmiş user hatası durumunda önbelleği temizleyip kurtaralım
+            const { clearAllCaches } = await import('https://cdn.doruklu.com/auth.js');
+            await clearAllCaches();
+            
+            _loginHandled = false;
             ui.showScreen('auth-screen');
-            ui.showError("Oturum doğrulanamadı, lütfen tekrar giriş yapın.");
+            ui.showError("Oturum doğrulanamadı, önbellek temizlendi. Lütfen tekrar deneyin.");
         }
+
     }
 }
 
