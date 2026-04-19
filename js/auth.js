@@ -2,6 +2,9 @@ import { supabase, AppState } from 'https://cdn.doruklu.com/supabase-config.js';
 import { ui } from 'https://cdn.doruklu.com/ui.js';
 import { initAdminPanel, loadUserLinks, initCardManager } from './app.js';
 
+let _loginHandled = false;
+
+
 export async function initAuth() {    
     // Redirect parametresini kaydet
     const urlParams = new URLSearchParams(window.location.search);
@@ -30,17 +33,24 @@ export async function initAuth() {
         }
     }
 
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (session) {
-        await handleLoginSuccess(session.user, session);
-    } else {
-        setTimeout(() => {
-            if (!_loginHandled) {
-                ui.showScreen('auth-screen');
-            }
-        }, 1000);
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+            await handleLoginSuccess(session.user, session);
+        } else {
+            setTimeout(() => {
+                if (!_loginHandled) {
+                    ui.showScreen('auth-screen');
+                }
+            }, 1000);
+        }
+    } catch (err) {
+        console.error("Auth initialization failed:", err);
+        ui.showScreen('auth-screen');
+        ui.showError("Sistem başlatılamadı. Lütfen sayfayı yenileyin.");
     }
+
 
     async function handleLoginSuccess(user, session) {
         if (_loginHandled) return;
