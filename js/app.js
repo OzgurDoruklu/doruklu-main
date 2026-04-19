@@ -87,10 +87,16 @@ async function loadUsersTable() {
     }
 
     ui.setLoading(true);
-    const { data: users } = await supabase.from('profiles').select('*').order('role', { ascending: false });
+    const { data: users, error } = await supabase.from('profiles').select('*').order('role', { ascending: false });
     ui.setLoading(false);
 
-    if (users) {
+    if (error) {
+        console.error("Error loading users:", error);
+        document.getElementById('users-table-body').innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--danger); padding:2rem;">Hata: Kullanıcılar yüklenemedi. (${error.message})</td></tr>`;
+        return;
+    }
+
+    if (users && users.length > 0) {
         const tbody = document.getElementById('users-table-body');
         tbody.innerHTML = users.map(user => {
             const p = user.permissions || {};
@@ -107,6 +113,8 @@ async function loadUsersTable() {
                 </tr>
             `;
         }).join('');
+    } else {
+        document.getElementById('users-table-body').innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-secondary); padding:2rem;">Hiç kullanıcı bulunamadı.</td></tr>`;
     }
 }
 

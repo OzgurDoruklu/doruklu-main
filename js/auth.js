@@ -104,13 +104,22 @@ export async function initAuth() {
             if (!profile) {
                 // Manuel Fallback (Yeni Kullanıcı Fix)
                 const meta = user.user_metadata;
-                const { data: newP } = await supabase.from('profiles').insert({ 
+                const payload = { 
                     id: user.id, 
                     role: 'player', 
                     display_name: meta?.full_name || meta?.name || user.email.split('@')[0],
                     email: user.email,
                     avatar_url: meta?.avatar_url || meta?.picture
-                }).select().single();
+                };
+
+                let { data: newP, error: insError } = await supabase.from('profiles').insert(payload).select().single();
+                
+                if (insError) {
+                    console.warn("Profile insert with email failed, retrying without email:", insError.message);
+                    delete payload.email;
+                    const { data: retryP } = await supabase.from('profiles').insert(payload).select().single();
+                    newP = retryP;
+                }
                 profile = newP;
             } else {
                 // Mevcut profil varsa email veya metadata güncelle (Emniyet için)
@@ -119,11 +128,20 @@ export async function initAuth() {
                 const googleAvatar = meta?.avatar_url || meta?.picture;
 
                 if (!profile.email || (googleName && googleName !== profile.display_name)) {
-                    const { data: updatedP } = await supabase.from('profiles').update({
+                    const updatePayload = {
                         email: user.email,
                         display_name: googleName || profile.display_name,
                         avatar_url: googleAvatar || profile.avatar_url
-                    }).eq('id', user.id).select().single();
+                    };
+                    
+                    let { data: updatedP, error: updError } = await supabase.from('profiles').update(updatePayload).eq('id', user.id).select().single();
+                    
+                    if (updError) {
+                        console.warn("Profile update with email failed, retrying without email:", updError.message);
+                        delete updatePayload.email;
+                        const { data: retryUpdP } = await supabase.from('profiles').update(updatePayload).eq('id', user.id).select().single();
+                        updatedP = retryUpdP;
+                    }
                     if (updatedP) profile = updatedP;
                 }
             }
