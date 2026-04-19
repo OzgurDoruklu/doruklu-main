@@ -98,7 +98,7 @@ async function loadUsersTable() {
             return `
                 <tr>
                     <td>
-                        <div style="font-weight:700; color:var(--text-main);">${user.display_name || user.email.split('@')[0]}</div>
+                        <div style="font-weight:700; color:var(--text-main);">${user.display_name || (user.email ? user.email.split('@')[0] : 'User ' + user.id.substring(0,8))}</div>
                         <div style="font-size:0.75rem; color:var(--text-secondary);">${user.role}</div>
                     </td>
                     <td><label class="toggle"><input type="checkbox" onchange="window.updatePerm('${user.id}', 'toprak_game', this.checked)" ${p.toprak_game || isSuper ? 'checked' : ''} ${isSuper ? 'disabled' : ''}><span class="slider"></span></label></td>

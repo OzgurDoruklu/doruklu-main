@@ -102,9 +102,30 @@ export async function initAuth() {
             if (error && error.code !== 'PGRST116') throw error;
 
             if (!profile) {
-                // Manuel Fallback (CDN auth.js hallediyor ama burada da emniyet için kalsın)
-                const { data: newP } = await supabase.from('profiles').insert({ id: user.id, role: 'player', display_name: user.email.split('@')[0] }).select().single();
+                // Manuel Fallback (Yeni Kullanıcı Fix)
+                const meta = user.user_metadata;
+                const { data: newP } = await supabase.from('profiles').insert({ 
+                    id: user.id, 
+                    role: 'player', 
+                    display_name: meta?.full_name || meta?.name || user.email.split('@')[0],
+                    email: user.email,
+                    avatar_url: meta?.avatar_url || meta?.picture
+                }).select().single();
                 profile = newP;
+            } else {
+                // Mevcut profil varsa email veya metadata güncelle (Emniyet için)
+                const meta = user.user_metadata;
+                const googleName = meta?.full_name || meta?.name;
+                const googleAvatar = meta?.avatar_url || meta?.picture;
+
+                if (!profile.email || (googleName && googleName !== profile.display_name)) {
+                    const { data: updatedP } = await supabase.from('profiles').update({
+                        email: user.email,
+                        display_name: googleName || profile.display_name,
+                        avatar_url: googleAvatar || profile.avatar_url
+                    }).eq('id', user.id).select().single();
+                    if (updatedP) profile = updatedP;
+                }
             }
 
             AppState.profile = profile || { role: 'player', permissions: {} };
