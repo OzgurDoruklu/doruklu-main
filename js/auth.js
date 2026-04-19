@@ -122,14 +122,11 @@ export async function initAuth() {
             
             if (AppState.profile.role === 'super_admin' || AppState.profile.role === 'admin') {
                 document.getElementById('admin-quick-access').style.display = 'block';
-                document.getElementById('go-to-mgmt-btn').onclick = () => {
-                    ui.showScreen('management-screen');
-                    initAdminPanel();
-                    initCardManager();
-                };
+                initAdminPanel();
             } else {
                 document.getElementById('admin-quick-access').style.display = 'none';
             }
+
             
             loadUserLinks();
         } catch (err) {

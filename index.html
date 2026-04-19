@@ -10,87 +10,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.doruklu.com/style.css">
     <style>
-        /* Hub Specific Styles */
-        :root {
-            --card-code-bg: rgba(30, 41, 59, 0.7);
+        body { padding-top: 80px; }
+        .dashboard-container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+        
+        /* Minimalist App Switcher */
+        .minimal-apps { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 4rem; }
+        .mini-app-card {
+            background: var(--card-bg); border: 1px solid var(--glass-border);
+            padding: 1.2rem; border-radius: 18px; text-decoration: none; color: var(--text-main);
+            display: flex; align-items: center; gap: 15px; width: 280px; transition: 0.3s;
         }
+        .mini-app-card:hover { border-color: var(--primary); transform: translateY(-3px); background: var(--glass-bg); }
+        .mini-app-icon { width: 44px; height: 44px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); }
 
-        body {
-            padding-top: 80px; /* Global header gap */
+        /* Integrated Admin Suite */
+        .admin-suite-container {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 2rem; margin-top: 2rem;
+            display: none; animation: fadeIn 0.4s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .portal-section-title {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        .suite-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--glass-border); }
+        .suite-tabs { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+        .suite-tab { padding: 8px 16px; border-radius: 10px; cursor: pointer; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        .suite-tab:hover { background: rgba(99, 102, 241, 0.05); color: var(--text-main); }
+        .suite-tab.active { background: var(--primary); color: white; }
 
-        .portal-section-title::after {
-            content: ""; flex: 1; height: 1px; background: linear-gradient(to right, rgba(255,255,255,0.1), transparent);
+        .section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-secondary); margin-bottom: 1.5rem; display: block; }
+        
+        #go-to-mgmt-btn {
+            background: rgba(99, 102, 241, 0.05); color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.1); padding: 0.8rem 1.5rem;
+            border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: 0.3s;
         }
+        #go-to-mgmt-btn:hover { background: var(--primary); color: white; }
 
-        /* Nav Tabs Modern */
-        .nav-tabs {
-            display: flex; gap: 8px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 12px; border: 1px solid var(--glass-border); margin-bottom: 2.5rem;
-        }
-        .nav-tab {
-            padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: all 0.3s; color: var(--text-secondary); font-weight: 500; font-size: 0.95rem;
-        }
-        .nav-tab:hover { background: rgba(255,255,255,0.05); color: white; }
-        .nav-tab.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-
-        /* Code Manager Question Card */
-        .question-card-code {
-            background: var(--card-code-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            overflow: hidden;
-            font-family: 'JetBrains Mono', monospace;
-            transition: all 0.3s;
-            position: relative;
-        }
-        .question-card-code:hover {
-            transform: translateY(-3px);
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .q-header {
-            background: rgba(0,0,0,0.3);
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-        .q-body { padding: 15px; font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; }
-        .q-footer {
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.15);
-            display: flex; justify-content: space-between; align-items: center;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-        .q-type-badge { font-size: 0.7rem; background: rgba(99, 102, 241, 0.15); color: #818cf8; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(99, 102, 241, 0.2); }
-        .q-actions { display: flex; gap: 8px; }
-        .q-btn { background: none; border: none; cursor: pointer; color: #64748b; padding: 4px; border-radius: 4px; transition: 0.2s; }
-        .q-btn:hover { background: rgba(255,255,255,0.05); color: white; }
-        .q-btn.delete:hover { background: rgba(239, 68, 68, 0.1); color: #f87171; }
-
-        #cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .management-actions {
-            display: flex; justify-content: flex-end; margin-bottom: 1.5rem;
-        }
+        /* Question Cards Styling (Internal) */
+        #cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+        .code-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 14px; padding: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -102,123 +60,104 @@
     <div id="auth-screen" class="screen" style="display: flex;">
         <div class="auth-container">
             <h1 class="gradient-text">Doruklu Merkezi Portal</h1>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Ağ sistemine erişmek için lütfen Google ile kimliğinizi doğrulayın.</p>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">Ağ sistemine erişmek için lütfen Google ile kimliğinizi doğrulayın.</p>
             
-            <button id="google-btn" type="button" class="primary-btn google-btn" style="padding: 1.2rem; font-size: 1.2rem; border-radius: 16px;">
-                <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+            <button id="google-btn" type="button" class="primary-btn google-btn" style="padding: 1.2rem; font-size: 1.1rem; border-radius: 16px;">
+                <svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                 </svg>
-                Google ile Güvenli Giriş Yap
+                Google ile Güvenli Giriş
             </button>
         </div>
     </div>
 
     <!-- 2. DASHBOARD EKRANI -->
     <div id="dashboard-screen" class="screen">
-        <div class="dashboard-content" style="padding-top: 2rem;">
-            <div class="portal-section-title">Erişilebilir Uygulamalar</div>
-            <div class="apps-grid" id="apps-container">
-                <!-- JS'den Yüklenecek -->
-            </div>
+        <div class="dashboard-container">
+            <span class="section-label">Erişilebilir Uygulamalar</span>
+            <div class="minimal-apps" id="apps-container"></div>
 
-            <!-- Management trigger for admins only (JS will show/hide) -->
-            <div id="admin-quick-access" style="display:none; margin-top: 4rem;">
-                <div class="portal-section-title">Admin Hızlı Erişim</div>
-                <button id="go-to-mgmt-btn" class="app-card" style="width:100%; text-align:left; cursor:pointer;">
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <div style="background:rgba(99, 102, 241, 0.2); padding:15px; border-radius:12px;">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            <!-- Management trigger for admins only -->
+            <div id="admin-quick-access" style="display:none; margin-top: 2rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="section-label">Sistem Yönetimi</span>
+                    <button id="go-to-mgmt-btn">Yönetim Panelini Aç</button>
+                </div>
+
+                <!-- Integrated Admin Suite (Slides down when clicked) -->
+                <div id="admin-suite" class="admin-suite-container">
+                    <div class="suite-header">
+                        <div class="suite-tabs">
+                            <div class="suite-tab active" id="nav-users">İzin Kontrolü</div>
+                            <div class="suite-tab" id="nav-cards">Soru Bankası</div>
                         </div>
-                        <div>
-                            <div style="font-weight:700; font-size:1.1rem;">Sistem Yönetimi</div>
-                            <div style="color:var(--text-secondary); font-size:0.9rem;">Yetkileri düzenleyin, soru havuzunu yönetin.</div>
+                        <button id="close-mgmt-btn" style="background:none; border:none; color:var(--text-secondary); cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+                    </div>
+
+                    <!-- Users Tab -->
+                    <div id="users-section">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Kullanıcı / Rol</th>
+                                        <th>Toprak</th>
+                                        <th>Özgür</th>
+                                        <th>Nurcan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body"></tbody>
+                            </table>
                         </div>
                     </div>
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- 3. MANAGEMENT EKRANI -->
-    <div id="management-screen" class="screen">
-        <div class="dashboard-content" style="padding-top: 1rem;">
-            <div class="management-actions">
-                <button id="back-to-dash-btn" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    Portala Geri Dön
-                </button>
-            </div>
-
-            <div class="nav-tabs">
-                <div class="nav-tab active" id="nav-users">Kullanıcı İzinleri</div>
-                <div class="nav-tab" id="nav-cards">Soru Yönetimi</div>
-            </div>
-
-            <!-- Users Tab -->
-            <div id="users-section">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Kullanıcı / Rol</th>
-                                <th>Toprak</th>
-                                <th>Özgür</th>
-                                <th>Nurcan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Cards Tab -->
-            <div id="cards-section" style="display: none;">
-                <div class="management-actions" style="margin-bottom: 2rem;">
-                    <button id="open-add-card-btn" class="primary-btn" style="width:auto; padding: 10px 25px;">+ Yeni Soru Ekle</button>
-                </div>
-
-                <!-- Add Card Form (Modal-like or Inline) -->
-                <div id="add-card-container" style="display:none; margin-bottom: 3rem;" class="auth-container">
-                    <h3 style="margin-top:0; color:white;">Soru Tanımla</h3>
-                    <form id="add-card-form" style="text-align:left;">
-                        <input type="hidden" id="edit-id">
-                        <div class="input-group">
-                            <label style="display:block; margin-bottom: 8px; font-size:0.9rem; color:var(--text-secondary);">Soru Tipi</label>
-                            <select id="q-type" style="width:100%; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:white;">
-                                <option value="single_choice">Çoktan Seçmeli (Tek)</option>
-                                <option value="multi_choice">Çoktan Seçmeli (Çoklu)</option>
-                                <option value="free_text">Metin Aramalı</option>
-                            </select>
+                    <!-- Cards Tab -->
+                    <div id="cards-section" style="display: none;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
+                             <h3 style="margin:0; color:var(--text-main);">Flashcard Yönetimi</h3>
+                             <button id="open-add-card-btn" class="primary-btn" style="width:auto; padding: 10px 20px;">+ Yeni Soru</button>
                         </div>
-                        <div class="input-group">
-                            <label style="display:block; margin-bottom: 8px; font-size:0.9rem; color:var(--text-secondary);">Soru İçeriği</label>
-                            <textarea id="q-content" rows="3" required style="width:100%; padding:12px; border-radius:10px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:white; font-family:inherit;"></textarea>
-                        </div>
-                        <div class="input-group" id="options-group">
-                            <label style="display:block; margin-bottom: 8px; font-size:0.9rem; color:var(--text-secondary);">Seçenekler (Virgülle ayırın)</label>
-                            <input type="text" id="q-options" placeholder="A, B, C, D">
-                        </div>
-                        <div class="input-group">
-                            <label style="display:block; margin-bottom: 8px; font-size:0.9rem; color:var(--text-secondary);">Doğru Cevap</label>
-                            <input type="text" id="q-answer" required placeholder="Cevabı yazın">
-                        </div>
-                        <div style="display:flex; gap:10px;">
-                            <button type="submit" class="primary-btn" id="save-card-btn">Soruyu Kaydet</button>
-                            <button type="button" id="cancel-add-btn" class="glass-btn" style="width:auto; margin-top:0.5rem; padding:0 20px;">İptal</button>
-                        </div>
-                    </form>
-                </div>
 
-                <div id="cards-grid">
-                    <!-- Soru kartları buraya gelecek (Code Manager Style) -->
+                        <div id="add-card-container" style="display:none; margin-bottom: 3rem;" class="auth-container">
+                             <h3 style="margin-top:0; color:var(--text-main);">Soru Tanımla</h3>
+                             <form id="add-card-form" style="text-align:left;">
+                                <input type="hidden" id="edit-id">
+                                <div class="input-group">
+                                    <label style="display:block; margin-bottom: 8px; font-size:0.85rem; color:var(--text-secondary);">Soru Tipi</label>
+                                    <select id="q-type">
+                                        <option value="single_choice">Çoktan Seçmeli (Tek)</option>
+                                        <option value="multi_choice">Çoktan Seçmeli (Çoklu)</option>
+                                        <option value="free_text">Metin Aramalı</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label style="display:block; margin-bottom: 8px; font-size:0.85rem; color:var(--text-secondary);">Soru İçeriği</label>
+                                    <textarea id="q-content" rows="3" required></textarea>
+                                </div>
+                                <div class="input-group" id="options-group">
+                                    <label style="display:block; margin-bottom: 8px; font-size:0.85rem; color:var(--text-secondary);">Seçenekler (Virgülle ayırın)</label>
+                                    <input type="text" id="q-options" placeholder="A, B, C, D">
+                                </div>
+                                <div class="input-group">
+                                    <label style="display:block; margin-bottom: 8px; font-size:0.85rem; color:var(--text-secondary);">Doğru Cevap</label>
+                                    <input type="text" id="q-answer" required placeholder="Cevabı yazın">
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <button type="submit" class="primary-btn" id="save-card-btn">Kaydet</button>
+                                    <button type="button" id="cancel-add-btn" class="primary-btn" style="background:rgba(255,255,255,0.05); color:var(--text-main); width:auto;">İptal</button>
+                                </div>
+                             </form>
+                        </div>
+                        <div id="cards-grid"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="module" src="js/app.js?v=2026.04.19.2"></script>
+    <script type="module" src="js/app.js?v=2026.04.19.3"></script>
 </body>
 </html>
